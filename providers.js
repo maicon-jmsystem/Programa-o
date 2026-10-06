@@ -75,7 +75,7 @@ function renderNearbyProviders(data){
  const list=document.getElementById('providersList');list.dataset.city=data.city||'';list.dataset.region=data.region_code||'';list.dataset.country=data.country_code||'';delete list.dataset.discoveryCity;list._rankingCards=null;list.replaceChildren();
  const rows=selectNearbyProviders(data);
  document.getElementById('providersLocation').textContent=data.city?`Cidade estimada: ${data.city}${data.region_code?' / '+data.region_code:''}`:'Cidade não identificada';
- if(!rows.length){const message=document.createElement('p');message.textContent='Ainda não temos provedores pesquisados para essa cidade. Nenhuma recomendação será feita sem verificar os dados locais.';list.append(message);return;}
+ if(!rows.length){const message=document.createElement('p');message.textContent=data.country_code==='BR'?'Consulta automática de operadoras disponível para esta cidade. Aguardando o Google Maps…':'Ainda não temos provedores pesquisados para essa cidade.';list.append(message);return;}
  const heading=document.createElement('h3');heading.textContent=rows.some(p=>Number.isFinite(p.score))?'Operadoras e avaliações na região':`Melhores notas disponíveis · ${rows.filter(p=>rankingValue(p)!==null).length} provedores`;list.append(heading);
  const otherProviders=document.createElement('div');otherProviders.id='otherProviders';otherProviders.hidden=true;
  for(const rawProvider of rows){

@@ -49,3 +49,9 @@ Este ZIP usa permissão 644 nos arquivos. Se a hospedagem continuar mostrando
 755. A extração pode preservar permissões anteriores; confira os arquivos
 substituídos. Não use 777. Não altere a chave ou seu arquivo de configuração.
 Se apenas o Google retornar 403, o bloqueio é da API e exige outro diagnóstico.
+
+ATUALIZAÇÃO 20261006-2
+Substitua também index.html, além dos quatro arquivos citados acima. O HTML
+passa a carregar os arquivos com identificadores de versão para evitar misturar
+JavaScript antigo com novo. A seção mostra a versão e oferece Atualizar avaliações.
+Erros HTTP sem JSON agora aparecem explicitamente no painel.
