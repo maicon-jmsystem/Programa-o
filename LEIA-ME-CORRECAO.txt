@@ -42,3 +42,10 @@ VALIDAÇÃO REALIZADA
 
 O ranking existente combina Google e, na ausência, Reclame Aqui. São fontes
 com metodologias distintas. A correção mantém a fórmula original do projeto.
+
+PERMISSÕES NA HOSTGATOR
+Este ZIP usa permissão 644 nos arquivos. Se a hospedagem continuar mostrando
+403 ao abrir o site, confira no Gerenciador de Arquivos: arquivos 644 e pastas
+755. A extração pode preservar permissões anteriores; confira os arquivos
+substituídos. Não use 777. Não altere a chave ou seu arquivo de configuração.
+Se apenas o Google retornar 403, o bloqueio é da API e exige outro diagnóstico.
