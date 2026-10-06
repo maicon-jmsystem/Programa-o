@@ -1,0 +1,44 @@
+SPEEDGATE — CORREÇÃO DAS AVALIAÇÕES LOCAIS
+
+O pacote original não tinha Porto Alegre no catálogo. Para cidades de todos os 26 estados brasileiros e do Distrito Federal sem
+provedores cadastrados, esta versão consulta o Google Places e filtra os
+estabelecimentos pelo município e estado retornados pelo Google. A pesquisa
+retorna até 20 resultados; não é uma lista completa das operadoras da cidade.
+O endereço de um estabelecimento não garante cobertura no endereço do cliente.
+Operadoras sem avaliação confirmada continuam acessíveis, sem posição inventada.
+
+INSTALAÇÃO NA HOSTGATOR
+1. Faça backup dos arquivos atuais.
+2. Substitua providers.js, google-ratings.js, google-places.php e web.css pelos
+   arquivos deste pacote. Os demais arquivos da aplicação não foram alterados.
+3. O servidor deve executar PHP com cURL e iconv, e permitir requisições HTTPS
+   para places.googleapis.com. Não use apenas hospedagem estática.
+4. No Google Cloud, habilite Places API (New), configure o faturamento e uma
+   chave autorizada para essa API. Restrinja a chave para uso no servidor.
+5. Se GOOGLE_PLACES_API_KEY já estiver configurada no servidor, mantenha-a.
+   Alternativamente, crie google-places-config.php FORA da pasta pública,
+   exatamente um nível acima da pasta que contém google-places.php:
+
+   <?php
+   return ['apiKey' => 'INSIRA_A_CHAVE_SOMENTE_NO_SERVIDOR'];
+
+   Exemplo: aplicação em public_html/google-places.php -> configuração em
+   google-places-config.php no diretório pai de public_html. Não coloque a chave
+   em JavaScript, no HTML ou em arquivos públicos. Não envie a chave em chat.
+6. Atualize a página ignorando o cache do navegador e de eventuais serviços CDN.
+7. Conclua um teste em uma cidade brasileira, por exemplo São Paulo/SP, Manaus/AM ou Brasília/DF. Confira o
+   perfil e a nota no Google Maps pelos links dos cartões. Se a cidade estimada
+   pelo IP estiver errada, use o botão de localização existente no aplicativo.
+   A API do Google é cobrada conforme a conta e as regras do serviço.
+
+VALIDAÇÃO REALIZADA
+- JavaScript: verificação de sintaxe.
+- PHP: análise de sintaxe com php-parser (sem execução por runtime PHP).
+- Testes DOM com respostas simuladas: descoberta nos 26 estados e no DF, classificação
+  ponderada, preservação de provedores sem nota e aviso de chave ausente.
+- Não foi feita consulta real ao Google nem instalação na HostGator: não foram
+  disponibilizadas credenciais nem acesso à hospedagem. Nenhuma avaliação real
+  foi adicionada ou inventada.
+
+O ranking existente combina Google e, na ausência, Reclame Aqui. São fontes
+com metodologias distintas. A correção mantém a fórmula original do projeto.

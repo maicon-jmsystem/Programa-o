@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<!--
+  SpeedGate
+  Copyright (c) 2026 Maicon da Fonseca da Silva.
+  Código-fonte proprietário. Todos os direitos reservados.
+-->
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SPEEDGATE</title>
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css">
+</head>
+
+<body>
+
+<main class="app-shell">
+
+    <section class="topbar">
+
+        <div class="brand">
+            <img src="speedgate-logo.png" alt="SpeedGate">
+        </div>
+
+        <nav class="view-switch right-card" aria-label="Navegação do SpeedGate">
+            <button class="view-switch-button is-active" type="button" data-view="measurement" aria-pressed="true">
+                <span class="view-switch-icon measurement-switch-icon" aria-hidden="true"></span>
+                <span>Medição</span>
+            </button>
+            <button class="view-switch-button" type="button" data-view="history" aria-pressed="false">
+                <span class="view-switch-icon history-switch-icon" aria-hidden="true"></span>
+                <span>Histórico</span>
+            </button>
+            <button class="view-switch-button" type="button" data-view="improvement" aria-pressed="false">
+                <span class="view-switch-icon" aria-hidden="true">✦</span>
+                <span>Melhoria</span>
+            </button>
+        </nav>
+
+    </section>
+
+    <section class="improvement-panel is-hidden" id="improvementPanel" aria-labelledby="improvementTitle">
+        <h2 id="improvementTitle">Melhoria</h2>
+        <div class="help-topics">
+        <details><summary>Reiniciar o roteador e o ponto adicional</summary>
+        <ol class="restart-steps">
+            <li><span aria-hidden="true">1️⃣</span><p>Desligue o <strong>roteador e o ponto adicional</strong> da tomada. Não é necessário remover os cabos.</p></li>
+            <li><span aria-hidden="true">2️⃣</span><p>Aguarde <strong>30 segundos</strong>.</p></li>
+            <li><span aria-hidden="true">3️⃣</span><p>Ligue novamente o <strong>roteador e o ponto adicional</strong>.</p></li>
+            <li><span aria-hidden="true">4️⃣</span><p>Aguarde de <strong>2 a 3 minutos</strong> até que as luzes estabilizem.</p></li>
+            <li><span aria-hidden="true">5️⃣</span><p>Teste a conexão em um <strong>celular ou computador</strong>.</p></li>
+        </ol>
+        </details>
+        <details><summary>Teste de ping no Windows</summary>
+          <ol>
+            <li>Conecte o computador por cabo, se possível. Pause downloads e outros testes.</li>
+            <li>Pressione <strong>Windows + R</strong>, digite <code>cmd</code> e pressione Enter.</li>
+            <li>Digite <code>ipconfig</code> e procure o <strong>Gateway Padrão</strong> da conexão ativa.</li>
+            <li>Teste o roteador: <code>ping -n 30 192.168.1.1</code>. Substitua o IP pelo seu gateway; o endereço do exemplo pode ser diferente.</li>
+            <li>Teste a internet: <code>ping -n 30 1.1.1.1</code>. Depois compare com <code>ping -n 30 8.8.8.8</code>.</li>
+            <li>Para observar durante um travamento, use <code>ping -t 1.1.1.1</code>. Encerre com <strong>Ctrl + C</strong> para ver o resumo.</li>
+          </ol>
+          <p>Veja os pacotes perdidos e os tempos mínimo, máximo e médio. Perdas ou grandes oscilações repetidas merecem investigação. Se o gateway oscila, confira Wi-Fi, cabo e roteador. Se apenas destinos externos oscilam, pode haver congestionamento ou problema na rota. Um destino pode bloquear ping: falta de resposta isolada não prova falha na internet. Ping mede resposta, não velocidade em Mbps.</p>
+          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ping" target="_blank" rel="noopener noreferrer">Referência: Microsoft — ping ↗</a>
+        </details>
+        <details><summary>Teste de rota: tracert no Windows</summary>
+          <ol>
+            <li>Abra o Prompt de Comando com <strong>Windows + R → cmd → Enter</strong>.</li>
+            <li>Digite <code>tracert -d 1.1.1.1</code> e aguarde o resultado.</li>
+            <li>Compare com <code>tracert -d 8.8.8.8</code>, especialmente no horário do problema.</li>
+            <li>Envie ao suporte o resultado, o horário e se estava no cabo ou Wi-Fi.</li>
+          </ol>
+          <p>Cada linha é um salto da rota e os tempos são medidos em milissegundos. Asteriscos (*) indicam ausência de resposta dentro do prazo; alguns equipamentos ignoram essas sondagens mesmo encaminhando o tráfego. Um salto isolado lento não comprova defeito. Observe se a demora continua até o destino e compare com ping. No Windows, o comando é <strong>tracert</strong>.</p>
+          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tracert" target="_blank" rel="noopener noreferrer">Referência: Microsoft — tracert ↗</a>
+        </details>
+        <details><summary>Cabos de rede e limites de velocidade</summary>
+          <p><strong>Cat 4 não é a referência para 100 Mbps.</strong> É uma categoria antiga; substitua por cabo adequado. Confira a categoria escrita na capa.</p>
+          <div class="help-table"><table><thead><tr><th>Cabo</th><th>Referência para Ethernet</th></tr></thead><tbody>
+            <tr><td>Cat 4</td><td>Antigo, usado em redes legadas; inadequado para instalar uma rede Gigabit.</td></tr>
+            <tr><td>Cat 5</td><td>Referência comum para 100 Mbps; prefira Cat 5e ou superior em instalações atuais.</td></tr>
+            <tr><td>Cat 5e</td><td>1 Gbps (1.000 Mbps), até 100 m de canal.</td></tr>
+            <tr><td>Cat 6</td><td>1 Gbps até 100 m; 10 Gbps em trechos menores, até cerca de 55 m conforme a instalação.</td></tr>
+            <tr><td>Cat 6A</td><td>10 Gbps até 100 m de canal.</td></tr>
+          </tbody></table></div>
+          <p>A velocidade depende também das portas do roteador, switch, adaptador e aparelho. Uma porta de 100 Mbps limita a conexão mesmo com Cat 6. Em um link de 100 Mbps, um teste pode ficar próximo de 90–95 Mbps devido à sobrecarga de transmissão.</p>
+          <p><strong>Cabos ruins podem causar quedas e perda de velocidade:</strong> fios rompidos, conectores frouxos, oxidação ou montagem incorreta podem provocar erros, desconexões ou negociação em 100 Mbps. Gigabit usa os quatro pares; um cabo com apenas dois pares conectados pode ficar em 100 Mbps.</p>
+          <ol><li>Troque por um cabo Cat 5e ou Cat 6 de boa procedência, preferencialmente de cobre.</li><li>Teste outra porta Gigabit e confira a velocidade do link no computador.</li><li>Se persistir, peça ao técnico para verificar conectores e testar o cabeamento.</li></ol>
+          <a href="https://www.dell.com/support/kbdoc/en-us/000178859/a-guide-to-the-external-ports-and-connectors-on-a-dell-computer" target="_blank" rel="noopener noreferrer">Consulte também as especificações do seu equipamento ↗</a>
+        </details>
+        <details><summary>IPTV e TV Box travando: o que verificar</summary>
+          <p><strong>IPTV travando não significa, por si só, defeito na internet.</strong> O problema também pode estar no aplicativo, no aparelho ou no servidor do serviço. Se outros aplicativos funcionam normalmente, verifique primeiro o serviço de IPTV antes de atribuir a falha à operadora.</p>
+          <p><strong>Confira a regularidade do equipamento e do conteúdo.</strong> A homologação da Anatel se refere à TV Box, não é um selo de aprovação do serviço de IPTV. Um aparelho homologado não torna legal um serviço que distribui conteúdo sem autorização. Equipamentos não homologados e serviços irregulares podem apresentar riscos e interrupções; isso não comprova que todo travamento seja causado por eles.</p>
+          <p>Prefira uma TV Box homologada e serviços com conteúdo autorizado. Compare a reprodução com outro aplicativo e procure o suporte do serviço; se a falha também atingir outros usos da conexão, investigue a rede com o provedor.</p>
+          <a href="https://www.gov.br/anatel/pt-br/regulado/certificacao-de-produtos/smart-tv-box-homologados" target="_blank" rel="noopener noreferrer">Consultar TV Boxes homologadas na Anatel ↗</a>
+          <p>Travamentos podem vir do Wi-Fi, perda de pacotes, congestionamento, aplicativo, aparelho ou servidor do serviço. Ter muitos megas não garante reprodução estável.</p>
+          <ol>
+            <li><strong>Compare serviços:</strong> teste outro canal e outro aplicativo de vídeo. Se apenas um serviço trava, consulte o suporte dele.</li>
+            <li><strong>Teste por cabo:</strong> conecte a TV Box ao roteador com um cabo confiável. Muitas TV Boxes têm porta de apenas 100 Mbps; confirme o modelo.</li>
+            <li><strong>Se usar Wi-Fi:</strong> aproxime o aparelho do roteador e experimente 5 GHz, se compatível e com bom sinal.</li>
+            <li><strong>Reduza o uso simultâneo:</strong> pause downloads e teste uma qualidade de vídeo menor para comparar.</li>
+            <li><strong>Reinicie os equipamentos:</strong> use os passos acima; mantenha a TV Box ventilada e use uma fonte compatível.</li>
+            <li><strong>Confira o aplicativo:</strong> atualize pelo canal oficial, verifique espaço livre e, se necessário, limpe apenas o cache. Apagar dados pode remover login e configurações.</li>
+            <li><strong>Registre o problema:</strong> faça ping durante o travamento em um computador na mesma rede. Informe horário, aplicativo, canal, tipo de conexão e resultados ao suporte.</li>
+          </ol>
+          <p>Se o problema ocorre apenas em uma TV Box, compare outro aparelho. Se vários aplicativos e aparelhos falham, investigue a rede com o provedor. O ping para um destino público não testa diretamente o servidor de IPTV.</p>
+        </details>
+        </div>
+    </section>
+
+    <section class="history-panel is-hidden" id="historyPanel" aria-labelledby="historyTitle">
+        <div class="history-header">
+            <div>
+                <div class="card-kicker">RESULTADOS SALVOS</div>
+                <h2 id="historyTitle">Histórico de medições</h2>
+            </div>
+            <div class="history-actions">
+                <button class="clear-history-button" id="clearHistoryButton" type="button">Limpar histórico</button>
+            </div>
+        </div>
+        <div class="history-list" id="historyList"></div>
+    </section>
+
+    <section class="speed-stage">
+
+        <div class="speedometer">
+
+            <div class="gauge"></div>
+            <div class="tick-ring"></div>
+
+            <div class="scale">
+                <span class="mark m0">0</span>
+                <span class="mark m5">5</span>
+                <span class="mark m10">10</span>
+                <span class="mark m50">50</span>
+                <span class="mark m100">100</span>
+                <span class="mark m250">250</span>
+                <span class="mark m500">500</span>
+                <span class="mark m750">750</span>
+                <span class="mark m1000">1000</span>
+            </div>
+
+            <div class="center">
+                <div class="speed" id="speed">0</div>
+                <div class="unit">Mbps</div>
+                <div class="status" id="status">Pronto</div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="connection-info" aria-label="Conexão atual" aria-live="polite"><div><span>Operadora</span><strong id="providerName">Identificando…</strong><small id="publicIp">IP público: consultando…</small><a class="connection-link" href="https://downdetector.com.br/" target="_blank" rel="noopener noreferrer">Dondetector instabilidades ↗</a></div></section>
+    <section class="web-options"><p id="testNotice" role="alert" hidden></p><button id="cancelTest" type="button" hidden>Cancelar teste</button></section>
+
+    <button class="start-button" onclick="startTest()">
+        <span class="button-gauge"></span>
+        <span id="buttonLabel">INICIAR TESTE</span>
+    </button>
+
+    <section class="report-panel is-hidden" id="reportPanel">
+        <div class="report-tabs" role="tablist" aria-label="Detalhamento do teste">
+            <button class="report-tab is-active" type="button" data-report-tab="result">Resultado</button>
+            <button class="report-tab" type="button" data-report-tab="detail">Detalhamento</button>
+            <button class="report-tab" type="button" data-report-tab="improvements">Melhorias</button>
+        </div>
+
+        <div class="report-content" id="reportContent"></div>
+    </section>
+
+    <section class="metrics" hidden aria-hidden="true">
+
+        <article class="metric-card">
+            <div class="metric-icon">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                    <circle cx="24" cy="24" r="20"></circle>
+                    <path d="M30 18a8 8 0 0 0-13.2 3"></path>
+                    <path d="M16 16v5h5"></path>
+                    <path d="M18 30a8 8 0 0 0 13.2-3"></path>
+                    <path d="M32 32v-5h-5"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="metric-title ping-title">PING</div>
+                <div class="metric-value"><span id="ping">0</span><small>ms</small></div>
+            </div>
+        </article>
+
+        <article class="metric-card">
+            <div class="metric-icon">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                    <circle cx="24" cy="24" r="20"></circle>
+                    <path d="M12 28h8l4-12 5 20 4-8h3"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="metric-title jitter-title">JITTER</div>
+                <div class="metric-value"><span id="jitter">0</span><small>ms</small></div>
+            </div>
+        </article>
+
+        <article class="metric-card">
+            <div class="metric-icon download-icon">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                    <circle cx="24" cy="24" r="20"></circle>
+                    <path d="M24 12v21"></path>
+                    <path d="M15 25l9 9 9-9"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="metric-title download-title">DOWNLOAD</div>
+                <div class="metric-value"><span id="download">0</span><small>Mbps</small></div>
+            </div>
+        </article>
+
+        <article class="metric-card">
+            <div class="metric-icon upload-icon">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                    <circle cx="24" cy="24" r="20"></circle>
+                    <path d="M24 36V15"></path>
+                    <path d="M15 23l9-9 9 9"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="metric-title upload-title">UPLOAD</div>
+                <div class="metric-value"><span id="upload">0</span><small>Mbps</small></div>
+            </div>
+        </article>
+
+    </section>
+
+    <section class="service-panel" hidden>
+        <article class="service-box collapsible-panel is-collapsed" id="pingPanel">
+            <div class="service-header">
+                <div class="service-header-text">
+                    <h2>TESTE DE PING</h2>
+                    <span>Apps populares</span>
+                </div>
+                <button class="panel-toggle" type="button" aria-expanded="false" aria-controls="servicePingList" aria-label="Expandir teste de ping">
+                    <span class="toggle-chevron" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="service-grid collapsible-content" id="servicePingList">
+                <div class="service-loading">Verificando latencia...</div>
+            </div>
+        </article>
+
+        <article class="service-box outage-box collapsible-panel is-collapsed" id="outagePanel">
+            <div class="service-header">
+                <div class="service-header-text">
+                    <h2>DOWNDETECTOR</h2>
+                    <span>Downdetector + monitor próprio</span>
+                </div>
+                <button class="panel-toggle" type="button" aria-expanded="false" aria-controls="outageList" aria-label="Expandir Downdetector">
+                    <span class="toggle-chevron" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="outage-list collapsible-content" id="outageList">
+                <div class="service-loading">Consultando status...</div>
+            </div>
+        </article>
+    </section>
+
+<section hidden class="providers-panel" aria-labelledby="providersTitle"><h2 id="providersTitle">Provedores na sua região</h2><p id="providersLocation" role="status">Identificando a cidade pela conexão…</p><div id="providersList"></div></section>
+
+    <footer>
+        <span>SPEEDGATE &copy; 2026</span>
+        <span>Desenvolvido por Maicon da Fonseca da Silva</span>
+        <button class="android-api-button" id="androidApiButton" type="button" hidden>Configurar API</button>
+    </footer>
+
+</main>
+
+<script src="engine.js"></script>
+<script src="app.js"></script>
+<script src="web.js"></script><script src="providers.js"></script><script src="connection.js"></script><script src="location.js"></script><script src="google-ratings.js"></script>
+
+</body>
+</html>
+
