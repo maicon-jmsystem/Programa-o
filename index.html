@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPEEDGATE</title>
-<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css?v=brasil-20261007-1">
+<link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css?v=brasil-20261007-2">
 </head>
 
 <body>
@@ -32,16 +32,13 @@
                 <span class="view-switch-icon history-switch-icon" aria-hidden="true"></span>
                 <span>Histórico</span>
             </button>
-            <button class="view-switch-button" type="button" data-view="improvement" aria-pressed="false">
-                <span class="view-switch-icon" aria-hidden="true">✦</span>
-                <span>Melhoria</span>
-            </button>
         </nav>
 
     </section>
 
-    <section class="improvement-panel is-hidden" id="improvementPanel" aria-labelledby="improvementTitle">
-        <h2 id="improvementTitle">Melhoria</h2>
+    <template id="improvementTemplate">
+    <section class="improvement-panel" aria-labelledby="improvementTitle">
+        <h2 id="improvementTitle">Melhorias da conexão</h2>
         <div class="help-topics">
         <details><summary>Reiniciar o roteador e o ponto adicional</summary>
         <ol class="restart-steps">
@@ -107,6 +104,7 @@
         </details>
         </div>
     </section>
+    </template>
 
     <section class="history-panel is-hidden" id="historyPanel" aria-labelledby="historyTitle">
         <div class="history-header">
@@ -273,7 +271,7 @@
 
 <script src="engine.js"></script>
 <script src="app.js"></script>
-<script src="web.js"></script><script src="providers.js?v=brasil-20261007-1"></script><script src="connection.js?v=brasil-20261007-1"></script><script src="location.js?v=brasil-20261007-1"></script><script src="google-ratings.js?v=brasil-20261007-1"></script>
+<script src="web.js?v=brasil-20261007-2"></script><script src="providers.js?v=brasil-20261007-2"></script><script src="connection.js?v=brasil-20261007-2"></script><script src="location.js?v=brasil-20261007-2"></script><script src="google-ratings.js?v=brasil-20261007-2"></script>
 
 </body>
 </html>

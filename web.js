@@ -16,13 +16,6 @@ setGauge = function (value) {
     gauge.style.setProperty('--deg',`${degrees}deg`);
 };
 document.querySelector('.service-panel').remove();
-const previousSetAppView = setAppView;
-setAppView = function (viewName) {
-    previousSetAppView(viewName);
-    const improvement = viewName === 'improvement';
-    appShell.classList.toggle('is-improvement-view',improvement);
-    document.getElementById('improvementPanel').classList.toggle('is-hidden',!improvement);
-};
 loadConnectionInfo = function () {
     // O navegador não fornece os dados do adaptador Wi-Fi.
 };
@@ -38,13 +31,9 @@ renderResultReport = function () {
     reportContent.innerHTML = `<div class="report-summary">${summaryCard('Download',finalDownloadSpeed,'Mbps','download-title')}${summaryCard('Upload',finalUploadSpeed,'Mbps','upload-title')}${summaryCard('Latência HTTP',finalPingValue,'ms','ping-title')}${summaryCard('Jitter',finalJitterValue,'ms','jitter-title')}${summaryCard('Latência com download',loadedDown,'ms','ping-title')}${summaryCard('Latência com upload',loadedUp,'ms','ping-title')}</div>`;
 };
 packetLossDetailCard = () => '<p class="web-caption">Perda de pacotes não medida: requer infraestrutura adicional de medição.</p>';
-buildSuggestions = function () {
-    const tips = [];
-    if (finalPingValue > 50 || finalJitterValue > 10) tips.push({title:'Investigue a estabilidade',body:'Compare Wi-Fi e cabo e repita o teste sem outros downloads. A rota até o servidor também influencia a latência.'});
-    if (Math.max(loadedDown || 0,loadedUp || 0)-finalPingValue > 50) tips.push({title:'Latência aumenta durante o uso',body:'A conexão apresentou maior atraso sob carga. Verifique tráfego de outros dispositivos e gerenciamento de filas no roteador.'});
-    tips.push({title:'Compare com seu plano',body:'Compare download e upload com o plano contratado. Uma velocidade menor não identifica, sozinha, a causa do problema.'});
-    tips.push({title:'Repita em condições semelhantes',body:'Para comparar resultados, use o mesmo aparelho, a mesma conexão e o mesmo servidor. VPN e Wi-Fi podem influenciar.'});
-    return tips;
+renderImprovementReport = function () {
+    const template = document.getElementById('improvementTemplate');
+    reportContent.replaceChildren(template.content.cloneNode(true));
 };
 startTest = async function () {
     if (running) return;

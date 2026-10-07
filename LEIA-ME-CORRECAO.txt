@@ -65,3 +65,9 @@ legítimos ainda não cadastrados e deve ser mantida com pesquisa manual.
 Vivo e Claro aparecem em seção separada de consulta de cobertura nacional.
 Sebratel aparece nessa seção para RS. Não se afirma cobertura por endereço,
 nem são atribuídas avaliações ou posições sem um perfil local confirmado.
+
+ATUALIZAÇÃO 20261007-2 — MELHORIAS
+Substitua index.html, web.js e web.css. O menu superior fica com Medição e
+Histórico. A aba inferior Melhorias agora contém o guia completo antes
+acessível pelo menu superior. Resultado e Detalhamento continuam disponíveis.
+Mantenha google-places.php e sua chave existentes.
