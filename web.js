@@ -54,10 +54,10 @@ startTest = async function () {
             });
             if(cancelled)return;
             finalPingValue=latencyResults.getUnloadedLatency();finalJitterValue=latencyResults.getUnloadedJitter();
-            const updatePhase=type=>(r,phase,seconds)=>{
+            const updatePhase=type=>(r,phase)=>{
                 const value=(type==='download'?r.getDownloadBandwidth():r.getUploadBandwidth())/1e6;
                 if(Number.isFinite(value)&&value>0)updateSpeed(value,type==='download'?download:upload,type==='download'?'Download':'Upload',type);
-                statusText.textContent=(type==='download'?'Download':'Upload')+' · '+seconds+'/15 s';
+                statusText.textContent=type==='download'?'Download':'Upload';
             };
             const downResults=await window.runSpeedGatePhase('download',updatePhase('download'));
             if(cancelled)return;

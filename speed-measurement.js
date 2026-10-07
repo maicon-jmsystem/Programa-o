@@ -2,8 +2,10 @@
 window.runSpeedGatePhase = function(type, onResults, durationMs = 15000) {
     const latency = type === 'latency';
     const measurements = latency ? [{type:'latency',numPackets:12}] : [
-        {type,bytes:65536,count:1,bypassMinDuration:true},
-        {type,bytes:65536,count:100000,bypassMinDuration:true}
+        {type,bytes:100000,count:1,bypassMinDuration:true},
+        {type,bytes:1000000,count:2,bypassMinDuration:true},
+        {type,bytes:10000000,count:2,bypassMinDuration:true},
+        {type,bytes:25000000,count:100000,bypassMinDuration:true}
     ];
     const engine = new window.CloudflareSpeedTest({
         autoStart:false, measurements,
@@ -11,8 +13,7 @@ window.runSpeedGatePhase = function(type, onResults, durationMs = 15000) {
         logAimApiUrl:null, logMeasurementApiUrl:null
     });
     return new Promise((resolve,reject) => {
-        let settled=false, payloadSized=false;
-        const started=performance.now();
+        let settled=false;
         const timer=setTimeout(()=>latency?finish(new Error('Tempo esgotado ao medir latência.')):finish(),latency?20000:durationMs);
         function finish(error){
             if(settled)return;settled=true;clearTimeout(timer);engine.pause();
@@ -25,12 +26,7 @@ window.runSpeedGatePhase = function(type, onResults, durationMs = 15000) {
         engine.onFinish=()=>{if(latency)finish();else finish(new Error('A etapa de velocidade terminou antes do tempo previsto.'));};
         engine.onResultsChange=({type:phase})=>{
             if(settled)return;
-            if(!latency){
-                const rate=type==='download'?engine.results.getDownloadBandwidth():engine.results.getUploadBandwidth();
-                // Dimensiona as próximas transferências para ~0,75 s, sem multiplicar resultados.
-                if(!payloadSized&&Number.isFinite(rate)&&rate>0){payloadSized=true;measurements[1].bytes=Math.min(25000000,Math.max(16384,Math.round(rate*0.75/8)));}
-            }
-            onResults(engine.results,phase,Math.min(15,Math.floor((performance.now()-started)/1000)));
+            onResults(engine.results,phase);
         };
         engine.play();
     });

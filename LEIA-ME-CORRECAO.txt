@@ -105,3 +105,12 @@ partir da primeira amostra. Não há multiplicação artificial da velocidade.
 Testes de temporização e cancelamento passaram com motor simulado; a precisão
 na conexão do usuário precisa ser comparada após a instalação.
 Mantenha seu google-places.php e a chave existentes.
+
+ATUALIZAÇÃO 20261007-6 — CORREÇÃO DA REGRESSÃO
+Substitua index.html, web.js e speed-measurement.js. O contador foi removido.
+As etapas de 15 segundos agora usam transferências progressivas de 100 KB,
+1 MB, 10 MB e 25 MB, sem tentar alterar uma etapa já iniciada pelo motor.
+Validação com o motor real e rede simulada: ambos os sentidos alcançam os
+quatro tamanhos, mantêm prazo de 15 segundos e respeitam cancelamento.
+A comparação na conexão do usuário ainda é necessária. Mantenha seu PHP
+e a chave Google existentes.
