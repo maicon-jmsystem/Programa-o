@@ -2,7 +2,6 @@ let activeEngine = null;
 let cancelled = false;
 let loadedDown = null;
 let loadedUp = null;
-const cancelButton = document.getElementById('cancelTest');
 setGauge = function (value) {
     const marks = [[0,7],[5,33],[10,58],[50,90],[100,125],[250,158],[500,188],[750,215],[1000,243]];
     const capped = Math.min(Math.max(value,0),1000);
@@ -22,11 +21,6 @@ loadConnectionInfo = function () {
 window.addEventListener('online', loadConnectionInfo);
 window.addEventListener('offline', loadConnectionInfo);
 loadConnectionInfo();
-cancelButton.addEventListener('click', () => {
-    cancelled = true;
-    if (activeEngine) activeEngine.pause();
-    if (window.finishCancelledTest) window.finishCancelledTest();
-});
 renderResultReport = function () {
     reportContent.innerHTML = `<div class="report-summary">${summaryCard('Download',finalDownloadSpeed,'Mbps','download-title')}${summaryCard('Upload',finalUploadSpeed,'Mbps','upload-title')}${summaryCard('Latência HTTP',finalPingValue,'ms','ping-title')}${summaryCard('Jitter',finalJitterValue,'ms','jitter-title')}${summaryCard('Latência com download',loadedDown,'ms','ping-title')}${summaryCard('Latência com upload',loadedUp,'ms','ping-title')}</div>`;
 };
@@ -39,11 +33,10 @@ startTest = async function () {
     if (running) return;
     document.getElementById('testNotice').hidden=true;
     if (!navigator.onLine) { statusText.textContent='Sem conexão'; return; }
-    document.querySelector('.providers-panel').hidden=true;
     loadConnectionInfo();
 
     running=true; cancelled=false; startButton.disabled=true;
-    cancelButton.hidden=false; buttonLabel.textContent='TESTANDO...'; resetTest();
+    buttonLabel.textContent='TESTANDO...'; resetTest();
     loadedDown=null; loadedUp=null; finalPingMethod='HTTP';
     try {
         {
@@ -78,7 +71,6 @@ startTest = async function () {
         showMainSpeed(finalDownloadSpeed,'Teste concluído');
         saveMeasurementHistory();
         showReport('result');
-        document.querySelector('.providers-panel').hidden=false;
     } catch(error) {statusText.textContent='Teste não concluído';document.getElementById('testNotice').textContent=error.message;document.getElementById('testNotice').hidden=false;}
-    finally {running=false;activeEngine=null;window.finishCancelledTest=null;startButton.disabled=false;cancelButton.hidden=true;buttonLabel.textContent='INICIAR TESTE';if(cancelled)statusText.textContent='Teste cancelado';}
+    finally {running=false;activeEngine=null;window.finishCancelledTest=null;startButton.disabled=false;buttonLabel.textContent='INICIAR TESTE';if(cancelled)statusText.textContent='Teste cancelado';}
 };

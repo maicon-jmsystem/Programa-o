@@ -114,3 +114,10 @@ Validação com o motor real e rede simulada: ambos os sentidos alcançam os
 quatro tamanhos, mantêm prazo de 15 segundos e respeitam cancelamento.
 A comparação na conexão do usuário ainda é necessária. Mantenha seu PHP
 e a chave Google existentes.
+
+ATUALIZAÇÃO 20261007-7 — REMOÇÃO DAS SEÇÕES MARCADAS
+Substitua index.html, web.js e connection.js. Removidos o painel de provedores
+e o botão Cancelar teste. A página não carrega mais os scripts de ranking,
+consulta de planos ou geolocalização. A identificação da operadora pelo IP,
+o teste de 15 segundos por direção, o histórico e o relatório continuam.
+Não é necessário modificar ou excluir arquivos privados da chave Google.

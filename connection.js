@@ -7,10 +7,6 @@ loadConnectionInfo = function () {
     const timeout = setTimeout(() => request.abort(), 8000);
     const name = document.getElementById('providerName');
     const ip = document.getElementById('publicIp');
-    if (!window.deviceLocationActive) {
-      document.getElementById('providersLocation').textContent = navigator.onLine ? 'Identificando a cidade pela conexão…' : 'Sem conexão para identificar a cidade';
-      document.getElementById('providersList').replaceChildren();
-    }
     name.textContent = navigator.onLine ? 'Identificando…' : 'Sem conexão';
     ip.textContent = 'IP público: —';
     if (!navigator.onLine) { clearTimeout(timeout); return; }
@@ -23,13 +19,11 @@ loadConnectionInfo = function () {
             if (connectionRequest !== request) return;
             name.textContent = typeof data.org === 'string' && data.org.trim() ? data.org : 'Operadora não identificada';
             ip.textContent = `IP público: ${data.ip}`;
-            renderNearbyProviders(data);
         })
         .catch(() => {
             if (connectionRequest !== request) return;
             name.textContent = navigator.onLine ? 'Operadora não identificada' : 'Sem conexão';
             ip.textContent = 'IP público: indisponível';
-            if (!window.deviceLocationActive) document.getElementById('providersLocation').textContent='Não foi possível identificar a cidade. Ative a localização ou tente novamente.';
         })
         .finally(() => { clearTimeout(timeout); if (connectionRequest === request) connectionRequest = null; });
 };
