@@ -77,3 +77,20 @@ Substitua index.html, providers.js, google-ratings.js e web.css. Mantenha o PHP
 e a chave existentes. Todas as operadoras ficam no mesmo painel, sem seção
 Outras operadoras nem cobertura separada. A ordem usa somente Google, com
 média ponderada por quantidade de avaliações; sem nota/volume fica ao final.
+
+ATUALIZAÇÃO 20261007-4 — PLANOS OFICIAIS
+Substitua index.html e providers.js; adicione official-plans.js,
+official-plans.php e official-provider-sites.json. Mantenha google-places.php
+e sua chave. O texto do link foi corrigido para Downdetector.
+Preços fixos antigos deixaram de ser exibidos. Há 14 fontes oficiais cadastradas.
+O PHP consulta somente os hosts cadastrados e lê ofertas JSON-LD Product/Service
+com velocidade no nome, preço explícito e moeda BRL. Não associa texto de
+velocidade e preços soltos nem presume mensalidade. Requer PHP cURL e DOM.
+Cache de 6 horas fora da pasta pública. Nenhuma credencial é necessária para
+essa consulta. Sites sem dados estruturados, com bloqueio ou exigência de CEP
+mostram link oficial e indisponibilidade de consulta automática.
+Ainda não há adaptadores para todas as operadoras. Provedores sem fonte
+cadastrada mostram esse estado; não são inventados sites nem planos.
+Validação: sintaxe PHP e JavaScript, interface com respostas simuladas.
+Consultas reais às operadoras não foram validadas: o proxy deste ambiente
+bloqueou os sites consultados. Verifique na hospedagem antes de divulgar preços.
