@@ -48,37 +48,29 @@ startTest = async function () {
     try {
         {
             if(!window.CloudflareSpeedTest) throw new Error('Motor de medição indisponível.');
-            await new Promise((resolve,reject) => {
-                const engine=activeEngine=new window.CloudflareSpeedTest({autoStart:false,measurements:[
-                    {type:'latency',numPackets:12},
-                    ...[1e5,1e6,1e7,2.5e7].map(bytes=>({type:'download',bytes,count:3})),
-                    ...[1e5,1e6,1e7,2.5e7].map(bytes=>({type:'upload',bytes,count:2}))
-                ]});
-                const timeout=setTimeout(()=>{engine.pause();reject(new Error('Tempo esgotado. Tente novamente.'));},120000);
-                window.finishCancelledTest=()=>{clearTimeout(timeout);resolve();};
-                engine.onResultsChange=({type})=>{
-                    if(cancelled) return;
-                    const r=engine.results;
-                    const val=type==='download'?r.getDownloadBandwidth()/1e6:type==='upload'?r.getUploadBandwidth()/1e6:0;
-                    if(Number.isFinite(val)&&val>0) updateSpeed(val,type==='download'?download:upload,type==='download'?'Download':'Upload',type);
-                    finalPingValue=r.getUnloadedLatency(); finalJitterValue=r.getUnloadedJitter();
-                    statusText.textContent=type==='latency'?'Medindo latência':type==='download'?'Download':'Upload';
-                };
-                engine.onError=error=>{clearTimeout(timeout);engine.pause();reject(new Error(String(error)));};
-                engine.onFinish=r=>{
-                    clearTimeout(timeout);
-                    finalDownloadSpeed=r.getDownloadBandwidth()/1e6; finalUploadSpeed=r.getUploadBandwidth()/1e6;
-                    finalPingValue=r.getUnloadedLatency();finalJitterValue=r.getUnloadedJitter();
-                    loadedDown=r.getDownLoadedLatency();loadedUp=r.getUpLoadedLatency();
-                    testHistory.download=r.getDownloadBandwidthPoints().map(p=>p.bps/1e6);
-                    testHistory.upload=r.getUploadBandwidthPoints().map(p=>p.bps/1e6);
-                    testHistory.ping=r.getUnloadedLatencyPoints();
-                    testHistory.jitter=testHistory.ping.slice(1).map((p,i)=>Math.abs(p-testHistory.ping[i]));
-                    if(![finalDownloadSpeed,finalUploadSpeed,finalPingValue,finalJitterValue].every(Number.isFinite)) reject(new Error('Amostras insuficientes. Repita o teste.'));
-                    else resolve();
-                };
-                engine.play();
+            const latencyResults=await window.runSpeedGatePhase('latency',r=>{
+                finalPingValue=r.getUnloadedLatency();finalJitterValue=r.getUnloadedJitter();
+                statusText.textContent='Medindo latência';
             });
+            if(cancelled)return;
+            finalPingValue=latencyResults.getUnloadedLatency();finalJitterValue=latencyResults.getUnloadedJitter();
+            const updatePhase=type=>(r,phase,seconds)=>{
+                const value=(type==='download'?r.getDownloadBandwidth():r.getUploadBandwidth())/1e6;
+                if(Number.isFinite(value)&&value>0)updateSpeed(value,type==='download'?download:upload,type==='download'?'Download':'Upload',type);
+                statusText.textContent=(type==='download'?'Download':'Upload')+' · '+seconds+'/15 s';
+            };
+            const downResults=await window.runSpeedGatePhase('download',updatePhase('download'));
+            if(cancelled)return;
+            const upResults=await window.runSpeedGatePhase('upload',updatePhase('upload'));
+            if(cancelled)return;
+            finalDownloadSpeed=downResults.getDownloadBandwidth()/1e6;
+            finalUploadSpeed=upResults.getUploadBandwidth()/1e6;
+            loadedDown=downResults.getDownLoadedLatency();loadedUp=upResults.getUpLoadedLatency();
+            testHistory.download=downResults.getDownloadBandwidthPoints().map(p=>p.bps/1e6);
+            testHistory.upload=upResults.getUploadBandwidthPoints().map(p=>p.bps/1e6);
+            testHistory.ping=latencyResults.getUnloadedLatencyPoints();
+            testHistory.jitter=testHistory.ping.slice(1).map((p,i)=>Math.abs(p-testHistory.ping[i]));
+            if(![finalDownloadSpeed,finalUploadSpeed,finalPingValue,finalJitterValue].every(Number.isFinite))throw new Error('Amostras insuficientes. Repita o teste.');
         }
         if(cancelled) return;
         setVisualTarget('download',finalDownloadSpeed);setVisualTarget('upload',finalUploadSpeed);

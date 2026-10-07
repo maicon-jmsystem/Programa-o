@@ -94,3 +94,14 @@ cadastrada mostram esse estado; não são inventados sites nem planos.
 Validação: sintaxe PHP e JavaScript, interface com respostas simuladas.
 Consultas reais às operadoras não foram validadas: o proxy deste ambiente
 bloqueou os sites consultados. Verifique na hospedagem antes de divulgar preços.
+
+ATUALIZAÇÃO 20261007-5 — DURAÇÃO DA MEDIÇÃO
+Substitua index.html e web.js; adicione speed-measurement.js.
+Cada direção mede durante 15 segundos, encerrando a requisição em andamento
+no fim da etapa. Amostras completas são preservadas; a transferência cancelada
+não é contabilizada como amostra completa. A latência inicial é medida antes
+e acrescenta tempo ao total. O tamanho das transferências é escolhido a
+partir da primeira amostra. Não há multiplicação artificial da velocidade.
+Testes de temporização e cancelamento passaram com motor simulado; a precisão
+na conexão do usuário precisa ser comparada após a instalação.
+Mantenha seu google-places.php e a chave existentes.
