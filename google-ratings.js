@@ -14,7 +14,7 @@ function googleErrorMessage(error){return ({not_configured:'Avaliações automá
   if(!city)return;
   if(!list.dataset.country||!state){setStatus('Não foi possível iniciar a busca: arquivos de localização e provedores incompatíveis. Atualize todos os arquivos do pacote.');return;}
   if(list.dataset.country!=='BR'||!['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].includes(state))return;
-  if(!(list._rankingCards||list.querySelectorAll('.provider-card')).length){
+  if(!(list._rankingCards||Array.from(list.querySelectorAll('.provider-card'))).some(card=>!card.dataset.coverageOnly)){
    if(list.dataset.discoveryCity===city+' / '+state)return;
    list.dataset.discoveryCity=city+' / '+state;
    setStatus('Buscando operadoras em '+city+' / '+state+' no Google Maps…');
@@ -33,7 +33,7 @@ function googleErrorMessage(error){return ({not_configured:'Avaliações automá
   }
   let changed=false;
   for(const card of list._rankingCards||list.querySelectorAll('.provider-card')){
-   if(card.dataset.googleRequested)continue;
+   if(card.dataset.coverageOnly||card.dataset.googleRequested)continue;
    changed=true;
    const title=card.querySelector('h3').textContent;
    const name=card.dataset.provider||title.replace(/^\d+º · /,'').split(' · ')[0];
@@ -59,7 +59,7 @@ function googleErrorMessage(error){return ({not_configured:'Avaliações automá
   if(changed)applyProviderRanking(list);
   } finally {busy=false;if(pending){pending=false;queueMicrotask(update);}}
  }
- const attribution=document.createElement('p');attribution.className='providers-note';attribution.textContent='Google Maps · busca Brasil · versão 20261007-1';
+ const attribution=document.createElement('p');attribution.className='providers-note';attribution.textContent='Google Maps · busca Brasil · versão 20261007-3';
  panel.append(attribution);
  function setStatus(message){if(attribution.textContent!==message)attribution.textContent=message;}
  async function readGoogleResponse(response){try{return await response.json();}catch{throw new Error('O servidor retornou HTTP '+response.status+' sem uma resposta JSON do Google Places. Verifique google-places.php na hospedagem.');}}

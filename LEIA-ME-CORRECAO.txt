@@ -71,3 +71,9 @@ Substitua index.html, web.js e web.css. O menu superior fica com Medição e
 Histórico. A aba inferior Melhorias agora contém o guia completo antes
 acessível pelo menu superior. Resultado e Detalhamento continuam disponíveis.
 Mantenha google-places.php e sua chave existentes.
+
+ATUALIZAÇÃO 20261007-3 — LISTA ÚNICA
+Substitua index.html, providers.js, google-ratings.js e web.css. Mantenha o PHP
+e a chave existentes. Todas as operadoras ficam no mesmo painel, sem seção
+Outras operadoras nem cobertura separada. A ordem usa somente Google, com
+média ponderada por quantidade de avaliações; sem nota/volume fica ao final.

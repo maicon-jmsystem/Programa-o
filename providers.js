@@ -89,18 +89,11 @@ function filterInternetOperators(providers){
  const seen=new Set();
  return providers.filter(p=>{const name=internetOperatorName(p.name);if(!name||seen.has(name))return false;seen.add(name);return true;});
 }
-function renderCoverageOptions(data){
- const panel=document.querySelector('.providers-panel');if(!panel)return;
- let section=document.getElementById('providerCoverageOptions');
- if(!section){section=document.createElement('div');section.id='providerCoverageOptions';panel.append(section);}
- section.replaceChildren();
- if(data.country_code!=='BR'||!data.city)return;
- const heading=document.createElement('h3');heading.textContent='Operadoras para consultar cobertura';
- const note=document.createElement('p');note.textContent='Vivo e Claro oferecem internet fixa em diversas cidades. No RS, consulte também a Sebratel. A cobertura depende do seu endereço e não da presença de uma loja no Google Maps. Estas opções não recebem nota ou posição sem avaliação local confirmada.';
- section.append(heading,note);
+function coverageOperatorRows(data){
+ if(data.country_code!=='BR'||!data.city)return [];
  const brands=[['Vivo','https://www.vivo.com.br/para-voce/produtos-e-servicos/para-casa/internet'],['Claro','https://www.claro.com.br/internet/banda-larga']];
  if(data.region_code==='RS')brands.push(['Sebratel','https://sebratel.com.br/']);
- for(const [name,url] of brands){const card=document.createElement('article');card.className='provider-card';const title=document.createElement('h3');title.textContent=name;const info=document.createElement('p');info.textContent='Cobertura no seu endereço: a confirmar no site oficial.';const a=document.createElement('a');a.textContent='Consultar cobertura e planos ↗';a.href=url;a.target='_blank';a.rel='noopener noreferrer';card.append(title,info,a);section.append(card);}
+ return brands.map(([name,site])=>({name,site,cities:[data.city],coverageOnly:true,ra:'https://www.reclameaqui.com.br/busca/?q='+encodeURIComponent(name)}));
 }
 function selectNearbyProviders(data){
  if(Array.isArray(data.providers))return data.providers;
@@ -111,15 +104,16 @@ function selectNearbyProviders(data){
 }
 function renderNearbyProviders(data){
  const list=document.getElementById('providersList');list.dataset.city=data.city||'';list.dataset.region=data.region_code||'';list.dataset.country=data.country_code||'';delete list.dataset.discoveryCity;list._rankingCards=null;list.replaceChildren();
- renderCoverageOptions(data);
- const rows=selectNearbyProviders(data);
+ document.getElementById('providerCoverageOptions')?.remove();
+ const rows=[...selectNearbyProviders(data)];
+ for(const brand of coverageOperatorRows(data)){if(!rows.some(p=>(internetOperatorName(p.name)||p.name)===brand.name))rows.push(brand);}
  document.getElementById('providersLocation').textContent=data.city?`Cidade estimada: ${data.city}${data.region_code?' / '+data.region_code:''}`:'Cidade não identificada';
  if(!rows.length){const message=document.createElement('p');message.textContent=data.country_code==='BR'?'Consulta automática de operadoras disponível para esta cidade. Aguardando o Google Maps…':'Ainda não temos provedores pesquisados para essa cidade.';list.append(message);return;}
  const heading=document.createElement('h3');heading.textContent=rows.some(p=>Number.isFinite(p.score))?'Operadoras e avaliações na região':`Melhores notas disponíveis · ${rows.filter(p=>rankingValue(p)!==null).length} provedores`;list.append(heading);
  const otherProviders=document.createElement('div');otherProviders.id='otherProviders';otherProviders.hidden=true;
  for(const rawProvider of rows){
   const provider={...rawProvider,...providerProfiles[rawProvider.name]};
-  const card=document.createElement('article');card.className='provider-card';card.dataset.provider=provider.name;const initialGoogle=providerReputation[provider.name]?.google?.match(/^(\d+(?:,\d+)?) \/ 5/);if(Number.isFinite(provider.googleRating)){card.dataset.googleRating=provider.googleRating;card.dataset.googleCount=provider.googleCount||0;}else if(initialGoogle){card.dataset.googleRating=Number(initialGoogle[1].replace(',','.'));card.dataset.googleCount=providerReputation[provider.name].googleCount||'';}
+  const card=document.createElement('article');card.className='provider-card';card.dataset.provider=provider.name;if(provider.coverageOnly)card.dataset.coverageOnly='true';const initialGoogle=providerReputation[provider.name]?.google?.match(/^(\d+(?:,\d+)?) \/ 5/);if(Number.isFinite(provider.googleRating)){card.dataset.googleRating=provider.googleRating;card.dataset.googleCount=provider.googleCount||0;}
   const title=document.createElement('h3');const rating=rankingValue(provider);title.textContent=rating!==null?`${rows.indexOf(rawProvider)+1}º · ${provider.name} · ${rating.toLocaleString('pt-BR')}/5 · ${Number.isFinite(provider.score)?'Minha Conexão':'Google'}`:`${provider.name} · sem classificação`;
   const review=document.createElement('p');review.textContent=provider.review;
   const checked=document.createElement('small');checked.textContent=provider.googleDetails?'Google Maps · consultado agora · confirmar cobertura':'Dados pesquisados até '+researchDate+' · confirmar cobertura';
@@ -128,10 +122,10 @@ function renderNearbyProviders(data){
   for(const [label,url] of [['Consultar cobertura',provider.site],['Avaliações no Google',google],['Reclame Aqui',provider.ra]]){const a=document.createElement('a');a.textContent=label+' ↗';a.href=url;a.target='_blank';a.rel='noopener noreferrer';links.append(a);}
   const plans=document.createElement('div');plans.className='provider-plans';
   const planTitle=document.createElement('strong');planTitle.textContent='Planos de internet';plans.append(planTitle);
-  const offer=providerPlans[provider.name];
+  const offer=provider.coverageOnly?null:providerPlans[provider.name];
   if(offer){const grid=document.createElement('div');grid.className='plan-mini-grid';for(const item of offer.items){const parts=item.split(' · ');const mini=document.createElement('div');mini.className='plan-mini';const speed=document.createElement('strong');speed.textContent=parts[0].replace('Mbps','Mega');const price=document.createElement('span');price.textContent=parts[1]||'Sob consulta';mini.append(speed,price);if(parts[2]){const detail=document.createElement('small');detail.textContent=parts.slice(2).join(' · ');mini.append(detail);}grid.append(mini);}if(offer.items.length)plans.append(grid);const conditions=document.createElement('small');conditions.textContent=offer.conditions+' Pesquisa: '+(offer.checked||'04/10/2026')+'. Ofertas podem mudar.';plans.append(conditions);}
   else {const p=document.createElement('p');p.textContent='Preço e velocidades ainda não confirmados. Consulte as ofertas disponíveis para seu endereço.';plans.append(p);}
-  const planLink=document.createElement('a');planLink.textContent='Ver planos e condições ↗';planLink.href=provider.name==='Claro'?'https://www.claro.com.br/internet/banda-larga/rs/'+normalizeCity(data.city):offer?.source||provider.site;planLink.target='_blank';planLink.rel='noopener noreferrer';plans.append(planLink);
+  const planLink=document.createElement('a');planLink.textContent='Ver planos e condições ↗';planLink.href=offer?.source||provider.site;planLink.target='_blank';planLink.rel='noopener noreferrer';plans.append(planLink);
   const reputation=createReputationBadges(provider,google);
   const provenance=document.createElement('details');provenance.className='provider-provenance';const summary=document.createElement('summary');summary.textContent='Fontes e datas das avaliações';provenance.append(summary);const reputationData=providerReputation[provider.name];const explanation=document.createElement('p');explanation.textContent=provider.googleDetails?provider.googleDetails+' · Avaliações do estabelecimento; não medem diretamente a velocidade da conexão.':'Google: '+(reputationData?.googleDetail||'nota ainda não verificada para esta cidade')+'. Reclame Aqui: '+(reputationData?.raDetail||'reputação atual ainda não verificada')+'. Dados de pesquisa manual; não são atualizados em tempo real.';provenance.append(explanation);for(const attr of provider.googleAttributions||[]){if(!attr.providerUri)continue;const a=document.createElement('a');a.textContent=attr.provider||'Fonte';a.href=attr.providerUri;a.target='_blank';a.rel='noopener noreferrer';provenance.append(a);}
   if(Number.isFinite(provider.score))card.append(title,review,reputation,checked,plans,links,provenance);
@@ -143,30 +137,24 @@ function renderNearbyProviders(data){
 // Índice SpeedGate: média bayesiana com referência 3/5 e peso de 50 avaliações.
 function weightedProviderScore(rating,count){return (rating*count+3*50)/(count+50);}
 function providerCardScore(card){
- const data=providerReputation[card.dataset.provider];
- let raw,source,display,count;
- if(card.dataset.googleRating!==undefined&&Number.isFinite(Number(card.dataset.googleRating))){raw=Number(card.dataset.googleRating);source='Google';display=raw.toLocaleString('pt-BR')+'/5';count=Number(card.dataset.googleCount);}
- else {const ra=data?.ra?.match(/^(\d+(?:,\d+)?) \/ 10/);if(!ra)return null;raw=Number(ra[1].replace(',','.'))/2;source='Reclame Aqui';display=ra[1]+'/10';count=data.raCount;}
+ const raw=Number(card.dataset.googleRating),count=Number(card.dataset.googleCount);
+ if(card.dataset.googleRating===undefined||!Number.isFinite(raw)||raw<1||raw>5)return null;
  const confirmed=Number.isInteger(count)&&count>0;
- return {score:confirmed?weightedProviderScore(raw,count):null,source,display,count:confirmed?count:null};
+ return {score:confirmed?weightedProviderScore(raw,count):null,source:'Google',display:raw.toLocaleString('pt-BR',{maximumFractionDigits:1})+'/5',count:confirmed?count:null};
 }
 function applyProviderRanking(list){
- const cards=list._rankingCards||Array.from(list.querySelectorAll('.provider-card'));
- list._rankingCards=cards;
- const eligible=cards.map(card=>({card,rating:providerCardScore(card)})).filter(x=>x.rating).sort((a,b)=>(b.rating.score??-Infinity)-(a.rating.score??-Infinity)|| (b.rating.count??0)-(a.rating.count??0)||a.card.dataset.provider.localeCompare(b.card.dataset.provider,'pt-BR')).slice(0,10);
- cards.forEach(card=>card.hidden=true);
+ const cards=list._rankingCards||Array.from(list.querySelectorAll('.provider-card'));list._rankingCards=cards;
+ const entries=cards.map(card=>({card,rating:providerCardScore(card)})).sort((a,b)=>(b.rating?.score??-Infinity)-(a.rating?.score??-Infinity)||(b.rating?.count??0)-(a.rating?.count??0)||a.card.dataset.provider.localeCompare(b.card.dataset.provider,'pt-BR'));
  list.querySelector('#otherProviders')?.remove();list.querySelector('.providers-expand')?.remove();
- const heading=list.querySelector('h3');if(heading)heading.textContent='Mais bem avaliadas · '+eligible.length+' operadoras';
- for(const [index,{card,rating}] of eligible.entries()){
-  card.querySelector('h3').textContent=(rating.score!==null?(index+1)+'º':'Sem posição')+' · '+card.dataset.provider+' · '+rating.display+' · '+rating.source;
+ const heading=list.querySelector('h3');if(heading)heading.textContent='Operadoras · '+cards.length+' opções';
+ let position=0;
+ for(const {card,rating} of entries){
+  const ranked=rating?.score!=null;
+  card.querySelector('h3').textContent=(ranked?(++position)+'º · ':'')+card.dataset.provider+(rating?' · '+rating.display+' · Google':' · sem avaliação local do Google confirmada');
   let summary=card.querySelector('.ranking-volume');if(!summary){summary=document.createElement('p');summary.className='ranking-volume';card.insertBefore(summary,card.children[1]);}
-  summary.textContent=rating.count!==null?rating.count.toLocaleString('pt-BR')+' avaliações · Índice SpeedGate: '+rating.score.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'/5':'Quantidade de avaliações não confirmada; não recebe posição no ranking.';
+  summary.textContent=ranked?rating.count.toLocaleString('pt-BR')+' avaliações no Google · Índice SpeedGate: '+rating.score.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'/5':'Sem posição no ranking. Confirme a cobertura no seu endereço pelo site oficial.';
   card.hidden=false;list.append(card);
  }
- const unranked=cards.filter(card=>!eligible.some(entry=>entry.card===card));
- if(unranked.length){const others=document.createElement('details');others.className='providers-expand';const summary=document.createElement('summary');summary.textContent='Outras operadoras · '+unranked.length+' (sem posição confirmada ou fora do top 10)';others.append(summary);for(const card of unranked){card.hidden=false;others.append(card);}list.append(others);}
  let note=list.querySelector('.rating-ranking-note');if(!note){note=document.createElement('p');note.className='rating-ranking-note';list.insertBefore(note,heading?.nextSibling||list.firstChild);}
- note.textContent='Índice SpeedGate: (nota × quantidade + 3 × 50) ÷ (quantidade + 50). Poucas avaliações recebem menor peso. Usamos Google ou, na ausência, Reclame Aqui convertido para 5. As fontes medem aspectos diferentes. Volume desconhecido fica sem posição.';
-
- if(!eligible.length){note.textContent+=' Nenhuma nota confirmada disponível nesta cidade.';}
+ note.textContent='Prioridade pela nota e quantidade de avaliações do Google: (nota × quantidade + 3 × 50) ÷ (quantidade + 50). Assim, uma nota alta com poucas avaliações tem menos peso. Empresas sem nota e volume confirmados ficam ao final, sem posição. Avaliações não comprovam cobertura ou velocidade no seu endereço.';
 }
