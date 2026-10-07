@@ -55,3 +55,13 @@ Substitua também index.html, além dos quatro arquivos citados acima. O HTML
 passa a carregar os arquivos com identificadores de versão para evitar misturar
 JavaScript antigo com novo. A seção mostra a versão e oferece Atualizar avaliações.
 Erros HTTP sem JSON agora aparecem explicitamente no painel.
+
+ATUALIZAÇÃO 20261007-1 — FILTRO E OPERADORAS
+Substitua index.html, providers.js e google-ratings.js. Não é necessário
+substituir google-places.php: mantenha o PHP e a chave que já funcionam.
+A consulta usa uma lista conservadora de nomes de operadoras reconhecidas;
+nomes desconhecidos e consultorias são excluídos. A lista pode omitir provedores
+legítimos ainda não cadastrados e deve ser mantida com pesquisa manual.
+Vivo e Claro aparecem em seção separada de consulta de cobertura nacional.
+Sebratel aparece nessa seção para RS. Não se afirma cobertura por endereço,
+nem são atribuídas avaliações ou posições sem um perfil local confirmado.

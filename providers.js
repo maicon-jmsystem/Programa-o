@@ -64,6 +64,44 @@ function rankingValue(provider){
  return match?Number(match[1].replace(',','.')):null;
 }
 const normalizeCity = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+// Lista conservadora: resultados desconhecidos não recebem classificação automática.
+const internetOperatorAliases = [
+ ['RL NET', ['rl net','rlnet']], ['Unitec', ['unitec provedor de internet','unitec internet']],
+ ['BLUE3 INTERNET', ['blue3 internet']], ['POANET Telecom', ['poanet telecom','poanet']],
+ ['Mov Conexão', ['mov conexao']], ['Clicnet', ['clicnet']], ['Telium', ['telium']],
+ ['Vivo', ['vivo']], ['Claro', ['claro']], ['Sebratel', ['sebratel']],
+ ...Object.keys(providerProfiles).map(name=>[name,[name]]),
+ ...nearbyProviders.map(p=>[p.name,[p.name]]),
+ ...alvoradaRanking.map(p=>[p.name,[p.name]]),
+ ...cachoeirinhaRanking.map(p=>[p.name,[p.name]])
+];
+function internetOperatorName(name){
+ const normalized=normalizeCity(name).replace(/[^a-z0-9]+/g,' ').trim();
+ if(/\b(consultoria|consultor|assessoria|marketing|publicidade|software|agencia|wifi do cliente|pmweb)\b/.test(normalized))return null;
+ for(const [canonical,aliases] of internetOperatorAliases){
+  for(const alias of aliases){const key=normalizeCity(alias).replace(/[^a-z0-9]+/g,' ').trim();
+   if(normalized===key||normalized.startsWith(key+' '))return canonical;
+  }
+ }
+ return null;
+}
+function filterInternetOperators(providers){
+ const seen=new Set();
+ return providers.filter(p=>{const name=internetOperatorName(p.name);if(!name||seen.has(name))return false;seen.add(name);return true;});
+}
+function renderCoverageOptions(data){
+ const panel=document.querySelector('.providers-panel');if(!panel)return;
+ let section=document.getElementById('providerCoverageOptions');
+ if(!section){section=document.createElement('div');section.id='providerCoverageOptions';panel.append(section);}
+ section.replaceChildren();
+ if(data.country_code!=='BR'||!data.city)return;
+ const heading=document.createElement('h3');heading.textContent='Operadoras para consultar cobertura';
+ const note=document.createElement('p');note.textContent='Vivo e Claro oferecem internet fixa em diversas cidades. No RS, consulte também a Sebratel. A cobertura depende do seu endereço e não da presença de uma loja no Google Maps. Estas opções não recebem nota ou posição sem avaliação local confirmada.';
+ section.append(heading,note);
+ const brands=[['Vivo','https://www.vivo.com.br/para-voce/produtos-e-servicos/para-casa/internet'],['Claro','https://www.claro.com.br/internet/banda-larga']];
+ if(data.region_code==='RS')brands.push(['Sebratel','https://sebratel.com.br/']);
+ for(const [name,url] of brands){const card=document.createElement('article');card.className='provider-card';const title=document.createElement('h3');title.textContent=name;const info=document.createElement('p');info.textContent='Cobertura no seu endereço: a confirmar no site oficial.';const a=document.createElement('a');a.textContent='Consultar cobertura e planos ↗';a.href=url;a.target='_blank';a.rel='noopener noreferrer';card.append(title,info,a);section.append(card);}
+}
 function selectNearbyProviders(data){
  if(Array.isArray(data.providers))return data.providers;
  if(data.country_code !== 'BR' || data.region_code !== 'RS' || !data.city)return [];
@@ -73,6 +111,7 @@ function selectNearbyProviders(data){
 }
 function renderNearbyProviders(data){
  const list=document.getElementById('providersList');list.dataset.city=data.city||'';list.dataset.region=data.region_code||'';list.dataset.country=data.country_code||'';delete list.dataset.discoveryCity;list._rankingCards=null;list.replaceChildren();
+ renderCoverageOptions(data);
  const rows=selectNearbyProviders(data);
  document.getElementById('providersLocation').textContent=data.city?`Cidade estimada: ${data.city}${data.region_code?' / '+data.region_code:''}`:'Cidade não identificada';
  if(!rows.length){const message=document.createElement('p');message.textContent=data.country_code==='BR'?'Consulta automática de operadoras disponível para esta cidade. Aguardando o Google Maps…':'Ainda não temos provedores pesquisados para essa cidade.';list.append(message);return;}

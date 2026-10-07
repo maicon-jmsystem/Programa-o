@@ -23,8 +23,8 @@ function googleErrorMessage(error){return ({not_configured:'Avaliações automá
     const result=await readGoogleResponse(response);
     if(list.dataset.city!==city||list.dataset.region!==state)return;
     if(!response.ok){attribution.textContent=googleErrorMessage(result.error);return;}
-    const providers=(result.providers||[]).map(p=>({name:p.name,cities:[city],site:p.url,ra:'https://www.reclameaqui.com.br/busca/?q='+encodeURIComponent(p.name),googleRating:p.rating,googleCount:p.count,googleUrl:p.url,googleAttributions:p.attributions||[],googleDetails:'Google Maps · '+p.count+' avaliações · '+p.name+' · '+p.address}));
-    if(!providers.length){attribution.textContent='Google Maps: nenhum provedor com endereço confirmado nesta cidade. Isso não comprova ausência de cobertura.';return;}
+    const providers=filterInternetOperators(result.providers||[]).map(p=>({name:p.name,cities:[city],site:p.url,ra:'https://www.reclameaqui.com.br/busca/?q='+encodeURIComponent(p.name),googleRating:p.rating,googleCount:p.count,googleUrl:p.url,googleAttributions:p.attributions||[],googleDetails:'Google Maps · '+p.count+' avaliações · '+p.name+' · '+p.address}));
+    if(!providers.length){attribution.textContent='Google Maps: nenhum provedor da lista de operadoras reconhecidas com endereço confirmado nesta cidade. Isso não comprova ausência de cobertura.';return;}
     renderProvidersForCity({city,country_code:'BR',region_code:state,providers});
     for(const card of list._rankingCards||[])card.dataset.googleRequested='true';
     attribution.textContent='Avaliações consultadas no Google Maps · estabelecimentos locais; confirme a cobertura no seu endereço.';
@@ -59,7 +59,7 @@ function googleErrorMessage(error){return ({not_configured:'Avaliações automá
   if(changed)applyProviderRanking(list);
   } finally {busy=false;if(pending){pending=false;queueMicrotask(update);}}
  }
- const attribution=document.createElement('p');attribution.className='providers-note';attribution.textContent='Google Maps · busca Brasil · versão 20261006-2';
+ const attribution=document.createElement('p');attribution.className='providers-note';attribution.textContent='Google Maps · busca Brasil · versão 20261007-1';
  panel.append(attribution);
  function setStatus(message){if(attribution.textContent!==message)attribution.textContent=message;}
  async function readGoogleResponse(response){try{return await response.json();}catch{throw new Error('O servidor retornou HTTP '+response.status+' sem uma resposta JSON do Google Places. Verifique google-places.php na hospedagem.');}}
